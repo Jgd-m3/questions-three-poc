@@ -10,22 +10,25 @@ import os
 class Users_Tests(TestSuite):
 
     def setup_suite(self):
-        # BEFORE SUITE
+        """BEFORE SUITE"""
+
         load_dotenv()
         self.uri = os.getenv('gorest_uri')
         self.token = os.getenv('token')
 
     def teardown_suite(self):
-        # AFTER SUITE
+        """AFTER SUITE"""
         pass
 
     def setup(self):
-        # BEFORE TEST
+        """BEFORE TEST"""
+
         self.user = Users(self.uri, self.token)
         self.usr_id = None
 
     def teardown(self):    
-        # AFTER TEST
+        """AFTER TEST"""
+
         if self.usr_id is not None:
             resp = self.user.delete_user(self.usr_id)
             if resp.json()['code'] == 204:
@@ -36,6 +39,8 @@ class Users_Tests(TestSuite):
 
     # creation -----------------------------------------------------------------
     def test_create_user_successfully(self):
+        """Check to verify if the creation of users is correct -> happy path"""
+
         body = UserPayloads.new_user('MyBestUser', 'Male')
         resp = self.user.create_user(body)
         Poc_Asserts.check_status_code(200, resp.status_code)
@@ -51,6 +56,8 @@ class Users_Tests(TestSuite):
 
 
     def test_create_user_without_authorization(self):
+        """Check authorization for the creation of users"""
+
         body = UserPayloads.new_user('MyWorstUser', 'Male')
         resp = self.user.create_user_without_auth(body)
         Poc_Asserts.check_status_code(200, resp.status_code) #bad design of the api
@@ -61,6 +68,8 @@ class Users_Tests(TestSuite):
 
 
     def test_create_user_without_required_params(self):
+        """Checking the required parameters are actually needed"""
+
         params = UserPayloads.attrs()
         # one by one
         for elem in params:
@@ -75,6 +84,8 @@ class Users_Tests(TestSuite):
 
 
     def test_create_user_without_required_enum(self):
+        """Checking the restricted parameters are actually being respected"""
+
         dic = {
             'status': 'can be Active or Inactive',
             'gender': 'can be Male or Female'
@@ -89,6 +100,8 @@ class Users_Tests(TestSuite):
             
 
     def test_create_user_with_existing_email(self):
+        """checking email uniqueless"""
+
         body = UserPayloads.new_user('MyRepeatedUser', 'Male')
         resp = self.user.create_user(body).json()
         Poc_Asserts.check_status_code(201, resp['code'])
@@ -103,6 +116,8 @@ class Users_Tests(TestSuite):
 
     # update -----------------------------------------------------------------
     def test_update_user_successfully(self):
+        """checking updates (PUT) of a user"""
+
         body = UserPayloads.new_user('futureUpdated', 'Female')
         resp = self.user.create_user(body)
         Poc_Asserts.check_status_code(200, resp.status_code)
@@ -122,6 +137,8 @@ class Users_Tests(TestSuite):
 
 
     def test_update_user_without_authorization(self):
+        """Checking authorization updating users (PUT)"""
+
         body = UserPayloads.new_user('futureNotUpdated', 'Male')
         resp = self.user.create_user(body)
         Poc_Asserts.check_status_code(200, resp.status_code)
@@ -136,6 +153,8 @@ class Users_Tests(TestSuite):
         print('✓ user {} not updated properly [Unauthorized]'.format(self.usr_id))
 
     def test_update_user_not_found_error(self):
+        """Checking not found users to update (PUT)"""
+
         no_existing_id = 9999999999999999999
         useless_payload = {}
         resp_body = self.user.update_user(useless_payload, no_existing_id).json()
@@ -153,6 +172,8 @@ class Users_Tests(TestSuite):
 
     # deletion -----------------------------------------------------------------
     def test_delete_user_without_authorization(self):
+        """Checking authorization deleting users"""
+
         body = UserPayloads.new_user('delNotAuth', 'Male')
         resp_body = self.user.create_user(body).json()
         Poc_Asserts.check_status_code(201, resp_body['code'])
@@ -165,6 +186,8 @@ class Users_Tests(TestSuite):
 
 
     def test_delete_user_not_found_error(self):
+        """Checking not found users to delete"""
+
         no_existing_id = 9999999999999999999
         resp_body = self.user.delete_user(no_existing_id).json()
         Poc_Asserts.check_status_code(404, resp_body['code']) #checking the supposed real code
@@ -174,6 +197,8 @@ class Users_Tests(TestSuite):
 
     # get user by id -----------------------------------------------------------------
     def test_get_user_by_id_not_found_error(self): 
+        """Checking GET not found users"""
+
         no_existing_id = 9999999999999999999
         resp_body = self.user.get_user_by_id(no_existing_id).json()
         Poc_Asserts.check_status_code(404, resp_body['code']) #checking the supposed real code
@@ -184,6 +209,8 @@ class Users_Tests(TestSuite):
 
     # get users -----------------------------------------------------------------
     def test_pagination_get_users(self):
+        """Checking pagination getting users"""
+
         filters = {'page': 1}
         resp_body_pag1 = self.user.get_users_with_filters(filters).json()
         filters = {'page': 2}
@@ -199,6 +226,8 @@ class Users_Tests(TestSuite):
 
 
     def test_search_user_with_filters(self):
+        """Checking filters getting users"""
+
         body = UserPayloads.new_user('MyFilteredUser', 'Male')
         resp = self.user.create_user(body).json()
         Poc_Asserts.check_status_code(201, resp['code'])

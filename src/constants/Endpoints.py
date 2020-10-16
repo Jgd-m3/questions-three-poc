@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 from enum import Enum
 
+
 class Endpoints(Enum):
 
-    # events
+    """class to allocate all the enpoints used in the suites"""
+
+    # Users endpoints
     USERS = "public-api/users"
     USER_BY_ID = "public-api/users/{}"
-    POSTS = "public-api/posts"
-    POST_BY_ID = "public-api/posts/{}"
 
     def __str__(self):
         return str(self.value)
