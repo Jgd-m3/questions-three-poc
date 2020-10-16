@@ -1,7 +1,7 @@
 # questions-three-poc
 
 To run this PoC the first thing you need to do is: 
-1st have python installed and install the requierements:
+1st have python3 installed and install the requierements:
 
 ```sh
 pip install -r requirements.txt
@@ -18,7 +18,7 @@ mv ./env ./.env
 
 After it you're ready to run the project:
 ```sh
-python3 src/GoRest_Tests.py
+python3 src/Users_Tests.py
 ```
 
 Good Luck!

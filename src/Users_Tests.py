@@ -7,7 +7,7 @@ from assertions.Asserts import Poc_Asserts
 import os
 
 
-class GoRest_Tests(TestSuite):
+class Users_Tests(TestSuite):
 
     def setup_suite(self):
         # BEFORE SUITE
