@@ -14,21 +14,42 @@ class Users:
         self.url = uri
         self.token = auth_token
     
-    def create_user(self, usr_body):
+    def create_user(self, usr_body_dic):
         uri = '{}{}'.format(self.url, EP.USERS)
-        r = HttpClient().post(uri, data=usr_body, headers={'authorization': 'Bearer {}'.format(self.token), "Content-Type": "application/json"})
-        if r.status_code != 200:
-            #add logs here
-            raise StepError('user couldnt be created')
-        resp_body = r.json()['data']
-        print('usr created -> {}'.format(resp_body['id']))
-        return resp_body
+        headrs = {'authorization': 'Bearer {}'.format(self.token), "Content-Type": "application/json"}
+        return HttpClient().post(uri, data=json.dumps(usr_body_dic), headers=headrs)
+    
+    def create_user_without_auth(self, usr_body_dic):
+        uri = '{}{}'.format(self.url, EP.USERS)
+        headrs = {"Content-Type": "application/json"}
+        return HttpClient().post(uri, data=json.dumps(usr_body_dic), headers=headrs)
+
+    def update_user(self, usr_body_dic, usr_id):
+        uri = '{}{}'.format(self.url, EP.USER_BY_ID.params(usr_id))
+        headrs = {'authorization': 'Bearer {}'.format(self.token), "Content-Type": "application/json"}
+        return HttpClient().put(uri, data=json.dumps(usr_body_dic), headers=headrs)
+
+    def update_user_without_auth(self, usr_body_dic, usr_id):
+        uri = '{}{}'.format(self.url, EP.USER_BY_ID.params(usr_id))
+        headrs = {"Content-Type": "application/json"}
+        return HttpClient().put(uri, data=json.dumps(usr_body_dic), headers=headrs)
+
+
+    def get_user_by_id(self, usr_id):
+        uri = '{}{}'.format(self.url, EP.USER_BY_ID.params(usr_id))
+        return HttpClient().get(uri)
+
+
+    def get_users_with_filters(self, filters):
+        uri = '{}{}'.format(self.url, EP.USERS)
+        return HttpClient().get(uri, params=filters)
+
 
     def delete_user(self, usr_id):
         uri = '{}{}'.format(self.url, EP.USER_BY_ID.params(usr_id))
-        r = HttpClient().delete(uri, headers = {'authorization': 'Bearer {}'.format(self.token)})
-        if r.status_code == 200:
-            print('user deleted -> {}'.format(usr_id))
-        else:
-            #add logs here
-            raise StepError('user couldnt be deleted', r)
+        return HttpClient().delete(uri, headers = {'authorization': 'Bearer {}'.format(self.token)})
+
+
+    def delete_user_without_auth(self, usr_id):
+        uri = '{}{}'.format(self.url, EP.USER_BY_ID.params(usr_id))
+        return HttpClient().delete(uri)
